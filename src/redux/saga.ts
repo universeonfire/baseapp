@@ -10,7 +10,6 @@ import { rootMemberLevelsSaga } from '../modules/public/memberLevels';
 import {
     rootOrderBookSaga,
 } from '../modules/public/orderBook';
-import { rangerSagas } from '../modules/public/ranger/sagas';
 import {  rootRecentTradesSaga } from '../modules/public/recentTrades';
 import { rootApiKeysSaga } from '../modules/user/apiKeys/sagas';
 import { rootAuthSaga } from '../modules/user/auth';
@@ -68,7 +67,5 @@ export function* rootSaga() {
         call(rootUserActivitySaga),
         call(rootWalletsSaga),
         call(rootWithdrawLimitSaga),
-        // ranger?
-        call(rangerSagas),
     ]);
 }

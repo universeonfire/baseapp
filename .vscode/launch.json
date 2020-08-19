@@ -2,15 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Playground test",
+            "name": "Debug Jest Tests",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "/usr/bin/node",
-            "runtimeArgs": [
-                "--inspect-brk",
-                "/usr/bin/yarn",
-                "test"
-            ],
+            "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/jest/bin/jest.js", "--runInBand"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "port": 9229
+        },
+        {
+            "name": "Debug Current File",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": ["\"${workspaceRoot}\\node_modules\\jest\\bin\\jest.js\"", "\"${workspaceRoot}\\${relativeFile}\"", "--runInBand", "--config jest.config.js", ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "port": 9229

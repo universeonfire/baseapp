@@ -1,3 +1,134 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SignUp component should render 1`] = `ShallowWrapper {}`;
+exports[`SignUp component should render 1`] = `
+<form>
+  <div
+    className="cr-sign-up-form"
+    onKeyPress={[Function]}
+  >
+    <div
+      className="cr-sign-up-form__options-group"
+    >
+      <div
+        className="cr-sign-up-form__option"
+      >
+        <div
+          className="cr-sign-up-form__option-inner cr-sign-in-form__tab-signin"
+        >
+          Sign In
+        </div>
+      </div>
+      <div
+        className="cr-sign-up-form__option"
+      >
+        <div
+          className="cr-sign-up-form__option-inner __selected"
+        >
+          Sign Up
+        </div>
+      </div>
+    </div>
+    <div
+      className="cr-sign-up-form__form-content"
+    >
+      <div
+        className="cr-sign-up-form__group"
+      >
+        <CustomInput
+          autoFocus={true}
+          classNameInput="cr-sign-up-form__input"
+          classNameLabel="cr-sign-up-form__label"
+          defaultLabel="Email"
+          handleChangeInput={[MockFunction]}
+          handleFocusInput={[MockFunction]}
+          inputValue=""
+          label="Email"
+          placeholder="Email"
+          type="email"
+        />
+      </div>
+      <div
+        className="cr-sign-up-form__group"
+      >
+        <CustomInput
+          autoFocus={false}
+          classNameInput="cr-sign-up-form__input"
+          classNameLabel="cr-sign-up-form__label"
+          defaultLabel="Password"
+          handleChangeInput={[MockFunction]}
+          handleFocusInput={[MockFunction]}
+          inputValue=""
+          label="Password"
+          placeholder="Password"
+          type="password"
+        />
+      </div>
+      <div
+        className="cr-sign-up-form__group"
+      >
+        <CustomInput
+          autoFocus={false}
+          classNameInput="cr-sign-up-form__input"
+          classNameLabel="cr-sign-up-form__label"
+          defaultLabel="Confirm Password"
+          handleChangeInput={[MockFunction]}
+          handleFocusInput={[MockFunction]}
+          inputValue=""
+          label="Confirm Password"
+          placeholder="Confirm Password"
+          type="password"
+        />
+      </div>
+      <div
+        className="cr-sign-up-form__group"
+      >
+        <CustomInput
+          autoFocus={false}
+          classNameInput="cr-sign-up-form__input"
+          classNameLabel="cr-sign-up-form__label"
+          defaultLabel="Referral code"
+          handleChangeInput={[MockFunction]}
+          handleFocusInput={[MockFunction]}
+          inputValue=""
+          label="Referral code"
+          placeholder="Referral code"
+          type="text"
+        />
+      </div>
+      <Form
+        className="cr-sign-up-form__group"
+        inline={false}
+      >
+        <FormCheck
+          checked={false}
+          custom={true}
+          disabled={false}
+          id="agreeWithTerms"
+          inline={false}
+          isInvalid={false}
+          isValid={false}
+          label="I  agree all statements in terms of service"
+          onChange={[MockFunction]}
+          title=""
+          type="checkbox"
+        />
+      </Form>
+      <div
+        className="cr-sign-up-form__button-wrapper"
+      >
+        <Button
+          active={false}
+          block={true}
+          disabled={true}
+          onClick={[Function]}
+          size="lg"
+          type="button"
+          variant="primary"
+        >
+          Sign up
+        </Button>
+      </div>
+    </div>
+  </div>
+</form>
+`;

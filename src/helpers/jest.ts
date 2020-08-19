@@ -10,6 +10,7 @@ import { Config, Cryptobase } from '../api';
 // tslint:disable-next-line
 import * as WebSocket from 'ws';
 import { rootSaga } from '../redux/saga';
+import { RootState } from '../modules';
 
 const mockConfig: Config = {
     api: {
@@ -49,9 +50,9 @@ export const setupMockStore = (appMiddleware: Middleware, log = false) => {
     return configureMockStore(middlewares);
 };
 
-export const generateMockStore = (debug = false, content:any = undefined): MockStoreEnhanced => {
+export const generateMockStore = (debug = false, content:any = undefined): MockStoreEnhanced<RootState> => {
     const sagaMiddleware = createSagaMiddleware();
-    const store: MockStoreEnhanced = setupMockStore(sagaMiddleware, debug)(content) as any;
+    const store: MockStoreEnhanced<RootState> = setupMockStore(sagaMiddleware, debug)(content) as any;
     sagaMiddleware.run(rootSaga);
 
     return store;

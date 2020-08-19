@@ -9,7 +9,7 @@ export * from './emailValidation';
 export * from './filterData';
 export * from './formatCCYAddress';
 export * from './formatDate';
-export * from './geetest';
+// export * from './geetest.js';
 export * from './getCsrfToken';
 export * from './getHistorySagaParam';
 export * from './getLanguageByCode';

@@ -1,5 +1,5 @@
 import { incrementalOrderBook } from '../../../api';
-import { store } from '../../../store';
+import { store } from '../../../redux/store';
 import { CommonError, OrderEvent } from '../../types';
 import { Market } from '../markets';
 import { depthIncrementSubscribe } from '../orderBook';

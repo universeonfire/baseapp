@@ -1,3 +1,69 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EmailForm component should render 1`] = `ShallowWrapper {}`;
+exports[`EmailForm component should render 1`] = `
+<form>
+  <div
+    className="cr-email-form"
+  >
+    <div
+      className="cr-email-form__options-group"
+    >
+      <div
+        className="cr-email-form__option"
+      >
+        <div
+          className="cr-email-form__option-inner"
+        >
+          Forgot password
+          <div
+            className="cr-email-form__cros-icon"
+            onClick={[Function]}
+          >
+            <Component
+              className="close-icon"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="cr-email-form__form-content"
+    >
+      <div
+        className="cr-email-form__header"
+      />
+      <div
+        className="cr-email-form__group"
+      >
+        <CustomInput
+          autoFocus={true}
+          classNameInput="cr-email-form__input"
+          classNameLabel="cr-email-form__label"
+          defaultLabel="Email"
+          handleChangeInput={[MockFunction]}
+          handleFocusInput={[MockFunction]}
+          inputValue=""
+          label="Email"
+          placeholder="Email"
+          type="email"
+        />
+      </div>
+      <div
+        className="cr-email-form__button-wrapper"
+      >
+        <Button
+          active={false}
+          block={true}
+          disabled={true}
+          onClick={[Function]}
+          size="lg"
+          type="button"
+          variant="primary"
+        >
+          Send
+        </Button>
+      </div>
+    </div>
+  </div>
+</form>
+`;

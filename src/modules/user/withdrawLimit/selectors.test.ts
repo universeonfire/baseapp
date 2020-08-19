@@ -1,5 +1,4 @@
-import { createStore } from 'redux';
-import { rootReducer } from '../../index';
+import { store } from '../../../redux';
 import {
     selectWithdrawLimit,
     selectWithdrawLimitError,
@@ -7,8 +6,9 @@ import {
     selectWithdrawLimitSuccess,
 } from './selectors';
 
+// deprecated
 describe('WithdrawLimit selectors', () => {
-    const state = createStore(rootReducer).getState();
+    const state = store.getState();
 
     it('should select list', () => {
         expect(selectWithdrawLimit(state)).toEqual(state.user.withdrawLimit.data);

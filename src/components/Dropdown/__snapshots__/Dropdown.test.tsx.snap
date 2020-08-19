@@ -1,3 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Dropdown #render should render dropdown 1`] = `ShallowWrapper {}`;
+exports[`Dropdown #render should render dropdown 1`] = `
+<div
+  className="cr-dropdown"
+>
+  <Dropdown
+    navbar={false}
+  >
+    <DropdownToggle
+      id="dropdown-basic"
+      variant="primary"
+    >
+      Limit
+    </DropdownToggle>
+    <DropdownMenu
+      alignRight={false}
+      flip={true}
+    >
+      <DropdownItem
+        as={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "displayName": "SafeAnchor",
+            "render": [Function],
+          }
+        }
+        disabled={false}
+        key="0"
+        onSelect={[Function]}
+      >
+        Limit
+      </DropdownItem>
+      <DropdownItem
+        as={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "displayName": "SafeAnchor",
+            "render": [Function],
+          }
+        }
+        disabled={false}
+        key="1"
+        onSelect={[Function]}
+      >
+        Market
+      </DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+</div>
+`;

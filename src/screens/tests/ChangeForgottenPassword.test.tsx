@@ -2,11 +2,9 @@ import { shallow } from 'enzyme';
 import * as React from 'react';
 import { InjectedIntlProps } from 'react-intl';
 import { connect, Provider } from 'react-redux';
-import { createStore } from 'redux';
-import { rootReducer } from '../../modules';
+import { store } from '../../redux';
 import { ChangeForgottenPasswordScreen } from '../ChangeForgottenPasswordScreen';
 
-const store = createStore(rootReducer);
 const ChangeForgottenPasswordTab = connect()(ChangeForgottenPasswordScreen);
 
 const setup = (props: Partial<InjectedIntlProps> = {}) =>

@@ -2,7 +2,7 @@ import { Channel, delay, eventChannel } from 'redux-saga';
 // tslint:disable-next-line no-submodule-imports
 import { all, call, cancel, fork, put, race, select, take, takeEvery } from 'redux-saga/effects';
 import { isFinexEnabled, rangerUrl } from '../../../../api';
-import { store } from '../../../../store';
+import { store } from '../../../../redux/store';
 import { pushHistoryEmit } from '../../../user/history';
 import { selectOpenOrdersList, userOpenOrdersUpdate } from '../../../user/openOrders';
 import { userOrdersHistoryRangerData} from '../../../user/ordersHistory';

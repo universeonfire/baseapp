@@ -1,5 +1,4 @@
-import { createStore } from 'redux';
-import { rootReducer } from '../../index';
+import { store } from '../../../redux';
 import {
     selectTotalNumber,
     selectUserActivity,
@@ -11,8 +10,9 @@ import {
     selectUserActivityPageCount,
 } from './selectors';
 
+// deprecated
 describe('User activity selectors', () => {
-    const state = createStore(rootReducer).getState();
+    const state = store.getState();
     const limit = 25;
 
     it('should select User activity', () => {
