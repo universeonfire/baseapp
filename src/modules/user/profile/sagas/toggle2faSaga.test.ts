@@ -1,21 +1,16 @@
 import MockAdapter from 'axios-mock-adapter';
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { rootSaga } from '../../..';
-import { mockNetworkError, setupMockAxios, setupMockStore } from '../../../../helpers/jest';
+import { generateMockStore, mockNetworkError, setupMockAxios } from '../../../../helpers/jest';
 import { toggle2faData, toggle2faError, toggle2faFetch } from '../actions';
 
 
 describe('Module: Toggle 2fa', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let mockAxios: MockAdapter;
 
     beforeEach(() => {
         mockAxios = setupMockAxios();
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, false)();
-        sagaMiddleware.run(rootSaga);
+        store = generateMockStore();
     });
 
     afterEach(() => {

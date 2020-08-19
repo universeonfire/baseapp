@@ -1,9 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { rootSaga } from '../../../';
 import { Cryptobase, defaultConfig } from '../../../../api';
-import { setupMockAxios, setupMockStore } from '../../../../helpers/jest';
+import { generateMockStore, setupMockAxios } from '../../../../helpers/jest';
 import { PROFILE_RESET_USER } from '../../../user/profile/constants';
 import { alertPush } from '../actions';
 import { ALERT_DATA, ALERT_DELETE, ALERT_PUSH } from '../constants';
@@ -12,7 +10,6 @@ const debug = false;
 
 describe('Alert error handler', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let mockAxios: MockAdapter;
 
     afterEach(() => {
@@ -21,9 +18,7 @@ describe('Alert error handler', () => {
 
     beforeEach(() => {
         mockAxios = setupMockAxios();
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, debug)();
-        sagaMiddleware.run(rootSaga);
+        store = generateMockStore(debug);
         Cryptobase.config = {
             ...defaultConfig,
             msAlertDisplayTime: '0.01',

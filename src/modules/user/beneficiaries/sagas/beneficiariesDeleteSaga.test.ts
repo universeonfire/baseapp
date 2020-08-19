@@ -1,8 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { mockNetworkError, setupMockAxios, setupMockStore } from '../../../../helpers/jest';
-import { rootSaga } from '../../../../modules/index';
+import { generateMockStore, mockNetworkError, setupMockAxios } from '../../../../helpers/jest';
 import {
     beneficiariesDelete,
     beneficiariesDeleteData,
@@ -13,14 +11,11 @@ const debug = false;
 
 describe('Beneficiaries Delete', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let mockAxios: MockAdapter;
 
     beforeEach(() => {
         mockAxios = setupMockAxios();
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, debug)();
-        sagaMiddleware.run(rootSaga);
+        store = generateMockStore(debug);
     });
 
     afterEach(() => {

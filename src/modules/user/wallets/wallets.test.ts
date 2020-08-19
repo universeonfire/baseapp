@@ -1,8 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { rootSaga } from '../..';
-import { mockNetworkError, setupMockAxios, setupMockStore } from '../../../helpers/jest';
+import { generateMockStore, mockNetworkError, setupMockAxios } from '../../../helpers/jest';
 import { ALERT_DATA, ALERT_PUSH } from '../../public/alert/constants';
 import { walletsAddressFetch, walletsFetch, walletsWithdrawCcyFetch } from './actions';
 import {
@@ -21,7 +19,6 @@ const debug = false;
 
 describe('Wallets', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let mockAxios: MockAdapter;
 
     afterEach(() => {
@@ -30,9 +27,7 @@ describe('Wallets', () => {
 
     beforeEach(() => {
         mockAxios = setupMockAxios();
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, debug)();
-        sagaMiddleware.run(rootSaga);
+        store = generateMockStore(debug);
     });
 
     describe('Fetch wallets', () => {

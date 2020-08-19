@@ -1,8 +1,6 @@
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { rangerSagas } from '.';
 import { Cryptobase, defaultConfig } from '../../../../api';
-import { createEchoServer, setupMockStore } from '../../../../helpers/jest';
+import { createEchoServer, generateMockStore } from '../../../../helpers/jest';
 import { OrderEvent } from '../../../types';
 import { PrivateTradeEvent } from '../../../user/history';
 import { HISTORY_PUSH_EMIT } from '../../../user/history/constants';
@@ -36,7 +34,6 @@ const echoServerPort = 9100;
 
 describe('Ranger module', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let pingServer: any;
 
     beforeAll(() => {
@@ -61,8 +58,7 @@ describe('Ranger module', () => {
     });
 
     beforeEach(() => {
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, debug)({
+        store = generateMockStore(debug, {
             app: {
                 ranger: {
                     withAuth: false,
@@ -71,7 +67,6 @@ describe('Ranger module', () => {
                 },
             },
         });
-        sagaMiddleware.run(rangerSagas);
     });
 
     const marketExample: Market = {

@@ -1,8 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { rootSaga } from '../..';
-import { mockNetworkError, setupMockAxios, setupMockStore } from '../../../helpers/jest';
+import { generateMockStore, mockNetworkError, setupMockAxios } from '../../../helpers/jest';
 import { getTimezone, setTimezone } from '../../../helpers/timezone';
 import { Market } from '../markets';
 import { recentTradesFetch } from './actions';
@@ -13,7 +11,6 @@ const debug = false;
 
 describe('Trades module', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let mockAxios: MockAdapter;
     let originalTz: string;
 
@@ -21,9 +18,7 @@ describe('Trades module', () => {
         originalTz = getTimezone();
         setTimezone('Europe/Paris');
         mockAxios = setupMockAxios();
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, debug)();
-        sagaMiddleware.run(rootSaga);
+        store = generateMockStore(debug);
     });
 
     afterEach(() => {

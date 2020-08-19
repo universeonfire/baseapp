@@ -1,15 +1,12 @@
 import MockAdapter from 'axios-mock-adapter';
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { rootSaga } from '../../..';
-import { mockNetworkError, setupMockAxios, setupMockStore } from '../../../../helpers/jest';
+import { generateMockStore, mockNetworkError, setupMockAxios } from '../../../../helpers/jest';
 import { sendDocuments } from './actions';
 
 const debug = false;
 
 describe('KYC - Documents', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let mockAxios: MockAdapter;
 
     afterEach(() => {
@@ -18,9 +15,7 @@ describe('KYC - Documents', () => {
 
     beforeEach(() => {
         mockAxios = setupMockAxios();
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, debug)();
-        sagaMiddleware.run(rootSaga);
+        store = generateMockStore(debug);
     });
 
     describe('Send documents', () => {

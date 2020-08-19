@@ -1,9 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import { MockStoreEnhanced } from 'redux-mock-store';
-import createSagaMiddleware, { SagaMiddleware } from 'redux-saga';
-import { rootSaga } from '../..';
 import { getOrderAPI } from '../../../helpers';
-import { mockNetworkError, setupMockAxios, setupMockStore } from '../../../helpers/jest';
+import { generateMockStore, mockNetworkError, setupMockAxios } from '../../../helpers/jest';
 import { orderExecuteFetch } from './';
 import { OrderExecution } from './actions';
 import { ORDER_EXECUTE_DATA, ORDER_EXECUTE_ERROR, ORDER_EXECUTE_FETCH } from './constants';
@@ -14,7 +12,6 @@ const debug = false;
 
 describe('Orders', () => {
     let store: MockStoreEnhanced;
-    let sagaMiddleware: SagaMiddleware<{}>;
     let mockAxios: MockAdapter;
 
     const executedOrder = {
@@ -42,9 +39,7 @@ describe('Orders', () => {
 
     beforeEach(() => {
         mockAxios = setupMockAxios();
-        sagaMiddleware = createSagaMiddleware();
-        store = setupMockStore(sagaMiddleware, debug)();
-        sagaMiddleware.run(rootSaga);
+        store = generateMockStore(debug);
     });
 
     const order: OrderExecution = {

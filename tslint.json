@@ -168,7 +168,7 @@
     "deprecation": true,
     "eofline": true,
     "linebreak-style": [
-      true,
+      false,
       "LF"
     ],
     "max-classes-per-file": [
