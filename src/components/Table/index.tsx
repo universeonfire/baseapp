@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import * as React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 
 export type CellData = string | number | React.ReactNode | undefined;
 
@@ -23,7 +24,7 @@ export interface TableState {
     selectedRowKey?: string;
 }
 
-interface TableProps {
+interface Props {
     /**
      * Data which is used to render Table. The first element
      * of array is used to render table head unless `noHead`
@@ -78,139 +79,78 @@ interface TableProps {
 /**
  * Cryptobase Table overrides default table
  */
-class Table extends React.Component<TableProps, TableState> {
-    constructor(props: TableProps) {
-        super(props);
+export const Table: React.FC<Props> = ({
+    data,
+    header,
+    titleComponent,
+    filters = [],
+    rowKeyIndex,
+    onSelect,
+    rowBackground,
+    side,
+    rowBackgroundColor = 'rgba(184, 233, 245, 0.7)',
+    selectedKey,
+    colSpan,
+}) => {
+    const { formatMessage } = useIntl();
+    const [activeFilter, setActiveFilter] = useState<string>();
+    const [resultData, setResultData] = useState<CellData[][]>();
+    const [selectedRowKey, setSelectedRowKey] = useState<string | undefined>(selectedKey);
 
-        this.state = {
-            activeFilter: undefined,
-            resultData: undefined,
-            selectedRowKey: props.selectedKey,
-        };
-    }
-
-    public componentDidMount() {
-        const { filters } = this.props;
-        if (filters && filters.length > 0) {
-            this.handleFilter(filters[0]);
-        }
-    }
-
-    public componentWillReceiveProps(next: TableProps) {
-        if (this.state.selectedRowKey !== next.selectedKey) {
-            this.setState({selectedRowKey: next.selectedKey});
-        }
-    }
-
-    public componentDidUpdate(prevProps: TableProps) {
-        if (prevProps.data !== this.props.data && this.props.filters) {
-            const activeFilter = this.props.filters.find(
-                filter => filter.name === this.state.activeFilter,
+    const renderRowCells = useCallback(
+        (row: CellData[]) => {
+            return row && row.length ? (
+                row.map((c, index: number) => (
+                    <td key={index} colSpan={row.length === 1 ? colSpan : undefined}>
+                        {c}
+                    </td>
+                ))
+            ) : (
+                <td className="cr-table--no-data" colSpan={header && header.length}>
+                    {formatMessage({ id: 'page.noDataToShow' })}
+                </td>
             );
+        },
+        [header, colSpan, formatMessage]
+    );
 
-            if (activeFilter) {
-                this.handleFilter(activeFilter);
+    const handleFilter = useCallback(
+        (item: Filter) => {
+            if (!item.filter) {
+                setResultData(data);
+
+                return;
             }
-        }
-    }
+            setActiveFilter(item.name);
+            setResultData([...data].filter(item.filter));
+        },
+        [data]
+    );
 
-    public render() {
-        const { data, header, titleComponent, filters = [], rowKeyIndex } = this.props;
+    const handleSelect = useCallback(
+        (key: string) => () => {
+            if (onSelect) {
+                setSelectedRowKey(key);
+                onSelect(key);
+            }
+        },
+        []
+    );
 
-        this.ensureDataIsValid(data);
+    const renderFilters = useCallback(() => {
+        const getClassName = (filterName: string) =>
+            classNames('cr-table__filter', {
+                'cr-table__filter--active': activeFilter === filterName,
+            });
 
-        const cn = classNames('cr-table-header__content', {
-            'cr-table-header__content-empty': !titleComponent && filters.length === 0,
-        });
-
-        return (
-            <div className="cr-table-container">
-                <div className={cn}>
-                    {titleComponent ? this.renderTitleComponent() : null}
-                    {filters.length
-                        ?
-                        <div className="cr-table__filters">{this.renderFilters()}</div>
-                        : null}
-                </div>
-                <table className={'cr-table'}>
-                    {header && header.length && this.renderHead(header)}
-                    {this.renderBody(data, rowKeyIndex)}
-                </table>
-                {this.renderBackground(data)}
+        return filters.map((item: Filter) => (
+            <div className={getClassName(item.name)} key={item.name} onClick={() => handleFilter(item)}>
+                {item.name}
             </div>
-        );
-    }
+        ));
+    }, [activeFilter, filters, handleFilter]);
 
-    private renderTitleComponent() {
-        const { titleComponent } = this.props;
-
-        return <div className={'cr-title-component'}>{titleComponent}</div>;
-    }
-
-    private renderRowCells(row: CellData[]) {
-
-        return row && row.length ?
-            row.map((c, index: number) =>
-                <td key={index} colSpan={row.length === 1 ? this.props.colSpan : undefined}>{c}</td>) : [];
-    }
-
-    private handleFilter(item: Filter) {
-        const { data } = this.props;
-
-        if (!item.filter) {
-            this.setState({
-                resultData: data,
-            });
-
-            return;
-        }
-        const resultData: CellData[][] = [...data].filter(item.filter);
-        this.setState({
-            activeFilter: item.name,
-            resultData: resultData,
-        });
-    }
-
-    private handleSelect = (key: string) => () => {
-        const { onSelect } = this.props;
-
-        if (onSelect) {
-            this.setState({
-                selectedRowKey: key,
-            }, () => {
-                if (onSelect) {
-                    onSelect(key);
-                }
-            });
-        }
-    };
-
-    private renderFilters() {
-        const { filters = [] } = this.props;
-        const { activeFilter } = this.state;
-
-        const cn = (filterName: string) => classNames('cr-table__filter', {
-            'cr-table__filter--active': activeFilter === filterName,
-        });
-
-        return filters.map((item: Filter) => {
-            const handleFilterClick = () => {
-                this.handleFilter(item);
-            };
-
-            return (
-                <div
-                    className={cn(item.name)}
-                    key={item.name}
-                    onClick={handleFilterClick}
-                >
-                    {item.name}
-                </div>
-            );
-        });
-    }
-
-    private renderHead(row: CellData[]) {
+    const renderHead = useCallback((row: CellData[]) => {
         const cells = row.map((c, index) => <th key={index}>{c}</th>);
 
         return (
@@ -218,79 +158,87 @@ class Table extends React.Component<TableProps, TableState> {
                 <tr className={'cr-table__head-row'}>{cells}</tr>
             </thead>
         );
-    }
+    }, []);
 
-    private renderRowBackground(i: number) {
-        const { rowBackground, rowBackgroundColor = 'rgba(184, 233, 245, 0.7)' } = this.props;
-        const rowBackgroundResult = rowBackground ? rowBackground(i) : {};
-        const style = {
-            ...rowBackgroundResult,
-            backgroundColor: rowBackgroundColor,
-        };
+    const renderRowBackground = useCallback(
+        (i: number) => {
+            const rowBackgroundResult = rowBackground ? rowBackground(i) : {};
+            const style = {
+                ...rowBackgroundResult,
+                backgroundColor: rowBackgroundColor,
+            };
 
-        return (rowBackground
-            ? <span key={i} style={style} className="cr-table-background__row" />
-            : null);
-    }
+            return rowBackground ? <span key={i} style={style} className="cr-table-background__row" /> : null;
+        },
+        [rowBackground, rowBackgroundColor]
+    );
 
-    private renderBackground(rows: CellData[][]) {
-        const { resultData } = this.state;
-        const { rowBackground, side } = this.props;
-        const dataToBeMapped = resultData || rows;
-        const renderBackgroundRow = (r: CellData[], i: number) => this.renderRowBackground(i);
+    const renderBackground = useCallback(
+        (rows: CellData[][]) => {
+            const dataToBeMapped = resultData || rows;
+            const renderBackgroundRow = (r: CellData[], i: number) => renderRowBackground(i);
 
-        const className = classNames('cr-table-background', {
-            'cr-table-background--left': side === 'left',
-            'cr-table-background--right': side === 'right',
-        });
+            const className = classNames('cr-table-background', {
+                'cr-table-background--left': side === 'left',
+                'cr-table-background--right': side === 'right',
+            });
 
-        return (
-            <div className={className}>
-                {rowBackground && dataToBeMapped.map(renderBackgroundRow)}
-            </div>
-        );
-    }
+            return <div className={className}>{rowBackground && dataToBeMapped.map(renderBackgroundRow)}</div>;
+        },
+        [resultData, side, renderRowBackground, rowBackground]
+    );
 
-    private renderBody(rows: CellData[][], rowKeyIndex: number | undefined) {
-        const { resultData, selectedRowKey } = this.state;
+    const renderBody = useCallback(
+        (rows: CellData[][], rowKeyIndexValue: number | undefined) => {
+            const rowClassName = (key: string) =>
+                classNames({
+                    'cr-table__row--selected': selectedRowKey === key,
+                });
 
-        const rowClassName = (key: string) => classNames({
-            'cr-table__row--selected': selectedRowKey === key,
-        });
+            const dataToBeMapped = resultData || rows;
+            const rowElements = dataToBeMapped.map((r, i) => {
+                const rowKey = String(rowKeyIndexValue !== undefined ? r[rowKeyIndexValue] : i);
 
-        const dataToBeMapped = resultData || rows;
-        const rowElements = dataToBeMapped.map((r, i) => {
-            const rowKey = String((rowKeyIndex !== undefined) ? r[rowKeyIndex] : i);
+                return (
+                    <tr className={rowClassName(rowKey)} key={rowKey} onClick={handleSelect(rowKey)}>
+                        {renderRowCells(r)}
+                    </tr>
+                );
+            });
 
-            return (
-                <tr
-                    className={rowClassName(rowKey)}
-                    key={rowKey}
-                    onClick={this.handleSelect(rowKey)}
-                >
-                    {this.renderRowCells(r)}
-                </tr>
-            );
-        });
+            return <tbody className={'cr-table__body'}>{rowElements}</tbody>;
+        },
+        [handleSelect, renderRowCells, resultData, selectedRowKey]
+    );
 
-        return (
-            <tbody className={'cr-table__body'}>
-            {rowElements}
-            </tbody>
-        );
-    }
+    useEffect(() => {
+        if (filters) {
+            const newActiveFilter = filters.find((filter) => filter.name === activeFilter);
 
-    private ensureDataIsValid(data: CellData[][]) {
-        const length = data[0].length;
-        const len = data.length;
-        for (let i = 0; i < len; i += 1) {
-            if (data[i].length !== length) {
-                throw Error('Array elements must have the same length');
+            if (newActiveFilter) {
+                handleFilter(newActiveFilter);
             }
         }
-    }
-}
+    });
 
-export {
-    Table,
+    useEffect(() => {
+        setSelectedRowKey(selectedKey);
+    }, [selectedKey]);
+
+    return (
+        <div className="cr-table-container">
+            <div
+                className={classNames('cr-table-header__content', {
+                    'cr-table-header__content-empty': !titleComponent && filters.length === 0,
+                })}>
+                {titleComponent ? <div className={'cr-title-component'}>{titleComponent}</div> : null}
+                {filters.length ? <div className="cr-table__filters">{renderFilters()}</div> : null}
+            </div>
+            <table className={'cr-table'}>
+                {header && header.length && renderHead(header)}
+                {renderBody(data, rowKeyIndex)}
+            </table>
+            {renderBackground(data)}
+        </div>
+    );
 };

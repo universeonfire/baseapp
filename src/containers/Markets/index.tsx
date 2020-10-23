@@ -1,134 +1,98 @@
 import classnames from 'classnames';
-import * as React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Spinner } from 'react-bootstrap';
-import {
-    injectIntl,
-} from 'react-intl';
-import { connect, MapDispatchToPropsFunction } from 'react-redux';
-import { IntlProps } from '../../';
+import { useIntl } from 'react-intl';
+import { useDispatch } from 'react-redux';
+
 import { incrementalOrderBook } from '../../api';
 import { Decimal } from '../../components/Decimal';
 import { Markets } from '../../components/Markets';
-import { RootState, selectUserInfo, setCurrentPrice, User } from '../../modules';
-import {
-    Market,
-    marketsTickersFetch,
-    selectCurrentMarket,
-    selectMarkets,
-    selectMarketsLoading,
-    selectMarketTickers,
-    setCurrentMarket,
-    Ticker,
-} from '../../modules/public/markets';
+import { useMarketsTickersFetch, useReduxState } from '../../hooks';
+import { setCurrentPrice } from '../../modules';
+import { Market, setCurrentMarket } from '../../modules/public/markets';
 import { depthFetch } from '../../modules/public/orderBook';
 
-interface ReduxProps {
-    userData: User;
-    markets: Market[];
-    marketsLoading?: boolean;
-    marketTickers: {
-        [key: string]: Ticker,
-    };
-    currentMarket: Market | undefined;
-}
+export const MarketsComponent: React.FC = () => {
+    const { formatMessage } = useIntl();
+    const dispatch = useDispatch();
+    const marketsData = useReduxState((x) => x.public.markets.list);
+    const marketsLoading = useReduxState((x) => x.public.markets.loading);
+    const marketTickers = useReduxState((x) => x.public.markets.tickers);
+    const currentMarket = useReduxState((x) => x.public.markets.currentMarket);
 
-interface DispatchProps {
-    setCurrentMarket: typeof setCurrentMarket;
-    depthFetch: typeof depthFetch;
-    tickers: typeof marketsTickersFetch;
-    setCurrentPrice: typeof setCurrentPrice;
-}
+    const headers = useMemo(
+        () => [
+            formatMessage({ id: 'page.body.trade.header.markets.content.pair' }),
+            formatMessage({ id: 'page.body.trade.header.markets.content.price' }),
+            formatMessage({ id: 'page.body.trade.header.markets.content.change' }),
+        ],
+        []
+    );
 
-type Props = ReduxProps & DispatchProps & IntlProps;
-
-class MarketsContainer extends React.Component<Props> {
-    private headers = [
-        this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.pair'}),
-        this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.price'}),
-        this.props.intl.formatMessage({id: 'page.body.trade.header.markets.content.change'}),
-    ];
-
-    public componentDidMount() {
-        if (this.props.markets.length === 0) {
-            this.props.tickers();
-        }
-    }
-
-    public render() {
-        const { marketsLoading } = this.props;
-        const className = classnames('pg-markets', {
-            'pg-markets--loading': marketsLoading,
-        });
-
-        return (
-            <div className={className}>
-                {marketsLoading ? <div><Spinner animation="border" variant="primary" /></div> : this.markets()}
-            </div>
-        );
-    }
-
-    private markets = () => {
-        const { currentMarket } = this.props;
-        const key = currentMarket && currentMarket.name;
-
-        return (
-            <Markets
-                filters={false}
-                data={this.mapMarkets()}
-                rowKeyIndex={0}
-                onSelect={this.handleOnSelect}
-                selectedKey={key}
-                headers={this.headers}
-                title={this.props.intl.formatMessage({id: 'page.body.trade.header.markets'})}
-                filterPlaceholder={this.props.intl.formatMessage({ id: 'page.body.trade.header.markets.content.search'})}
-            />
-        );
-    };
-
-    private mapMarkets() {
-        const { markets, marketTickers } = this.props;
+    const mapMarkets = useCallback(() => {
         const defaultTicker = {
             last: 0,
             price_change_percent: '+0.00%',
         };
 
-        return markets.map((market: Market) =>
-            ([
-                market.name,
-                Decimal.format(Number((marketTickers[market.id] || defaultTicker).last), market.amount_precision, ','),
-                (marketTickers[market.id] || defaultTicker).price_change_percent,
-            ]),
-        );
-    }
+        return marketsData.map((market: Market) => [
+            market.name,
+            Decimal.format(Number((marketTickers[market.id] || defaultTicker).last), market.amount_precision),
+            (marketTickers[market.id] || defaultTicker).price_change_percent,
+        ]);
+    }, [marketTickers, marketsData]);
 
-    private handleOnSelect = (index: string) => {
-        const { markets, currentMarket } = this.props;
-        const marketToSet = markets.find(el => el.name === index);
-        this.props.setCurrentPrice(0);
+    const handleOnSelect = useCallback(
+        (index: string) => {
+            const marketToSet = marketsData && marketsData.find((el) => el.name === index);
+            dispatch(setCurrentPrice(0));
 
-        if (marketToSet && (!currentMarket || currentMarket.id !== marketToSet.id)) {
-            this.props.setCurrentMarket(marketToSet);
-            if (!incrementalOrderBook()) {
-              this.props.depthFetch(marketToSet);
+            if (marketToSet && (!currentMarket || currentMarket.id !== marketToSet.id)) {
+                dispatch(setCurrentMarket(marketToSet));
+                if (!incrementalOrderBook()) {
+                    dispatch(depthFetch(marketToSet));
+                }
             }
-        }
-    };
-}
+        },
+        [currentMarket, marketsData]
+    );
 
-const mapStateToProps = (state: RootState): ReduxProps => ({
-    userData: selectUserInfo(state),
-    markets: selectMarkets(state),
-    marketsLoading: selectMarketsLoading(state),
-    marketTickers: selectMarketTickers(state),
-    currentMarket: selectCurrentMarket(state),
-});
+    const renderMarkets = useCallback(() => {
+        const key = currentMarket && currentMarket.name;
 
-const mapDispatchToProps: MapDispatchToPropsFunction<DispatchProps, {}> =
-    dispatch => ({
-        setCurrentMarket: (market: Market) => dispatch(setCurrentMarket(market)),
-        depthFetch: (market: Market) => dispatch(depthFetch(market)),
-        tickers: () => dispatch(marketsTickersFetch()),
-        setCurrentPrice: payload => dispatch(setCurrentPrice(payload)),
-    });
+        return (
+            <Markets
+                filters={false}
+                data={mapMarkets()}
+                rowKeyIndex={0}
+                onSelect={handleOnSelect}
+                selectedKey={key}
+                headers={headers}
+                title={formatMessage({ id: 'page.body.trade.header.markets' })}
+                filterPlaceholder={formatMessage({ id: 'page.body.trade.header.markets.content.search' })}
+            />
+        );
+    }, [currentMarket, handleOnSelect, headers, mapMarkets]);
 
-export const MarketsComponent = injectIntl(connect(mapStateToProps, mapDispatchToProps)(MarketsContainer)) as any;
+    const className = useMemo(
+        () =>
+            classnames('pg-markets', {
+                'pg-markets--loading': marketsLoading,
+            }),
+        [marketsLoading]
+    );
+
+    useMarketsTickersFetch();
+
+    return (
+        <div className={className}>
+            {marketsLoading ? (
+                <div>
+                    <Spinner animation="border" variant="primary" />
+                </div>
+            ) : (
+                renderMarkets()
+            )}
+        </div>
+    );
+};

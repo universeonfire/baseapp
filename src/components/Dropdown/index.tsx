@@ -1,11 +1,12 @@
 import classnames from 'classnames';
-import * as React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { ChevronIcon } from '../../assets/images/ChevronIcon';
+import { convertToString } from '../../helpers';
 
 type DropdownElem = number | string | React.ReactNode;
 
-export interface DropdownComponentProps {
+interface Props {
     /**
      * List of options
      */
@@ -33,85 +34,45 @@ export interface DropdownComponentProps {
     disableContentEditable?: boolean;
 }
 
-interface DropdownComponentState {
-    selected: string;
-    selectedIndex: string;
-}
-
 /**
  *  Cryptobase Dropdown that overrides default dropdown with list of options.
  */
-class DropdownComponent extends React.PureComponent<DropdownComponentProps & {}, DropdownComponentState> {
-    constructor(props: DropdownComponentProps) {
-        super(props);
-        const selectedValue = this.props.placeholder || this.convertToString(this.props.list[0]);
-        this.state = {
-            selected: selectedValue,
-            selectedIndex: '0',
-        };
-    }
 
-    public componentDidUpdate(prevProps: DropdownComponentProps) {
-        const { placeholder } = this.props;
+export const DropdownComponent: React.FC<Props> = ({ list, className, placeholder = '', onSelect }) => {
+    const [selected, setSelected] = React.useState<string>('');
 
-        if (placeholder && placeholder !== prevProps.placeholder) {
-            this.setState({
-                selected: placeholder,
-                selectedIndex: '0',
-            });
-        }
-    }
+    const defaultPlaceholder = list[0];
 
-    public render() {
-        const { list } = this.props;
-        const { selected } = this.state;
-        const cx = classnames('cr-dropdown', this.props.className, {
-            'cr-dropdown--default': selected === this.props.placeholder,
-        });
+    const handleSelect = useCallback(
+        (elem: DropdownElem, index: number) => {
+            onSelect && onSelect(index);
+            setSelected(convertToString(elem));
+        },
+        [onSelect]
+    );
 
-        return (
-            <div className={cx}>
-                <Dropdown>
-                    <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                        {selected}
-                        <ChevronIcon className="cr-dropdown__arrow" />
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        {list.map((elem, index) => this.renderElem(elem, index))}
-                    </Dropdown.Menu>
-                </Dropdown>
-            </div>
-        );
-    }
+    useEffect(() => {
+        setSelected(placeholder || convertToString(defaultPlaceholder));
+    }, [placeholder, defaultPlaceholder]);
 
-    private renderElem = (elem: DropdownElem, index: number) => {
-        return  (
-            <Dropdown.Item
-                key={index}
-                onSelect={ (eventKey: any, e?: React.SyntheticEvent<unknown>) => this.handleSelect(elem, index)}
-            >
-                {elem}
-            </Dropdown.Item>
-        );
-    };
-
-    private handleSelect = (elem: DropdownElem, index: number) => {
-        this.props.onSelect && this.props.onSelect(index);
-        this.setState({
-            selected: this.convertToString(elem),
-            selectedIndex: index.toString(),
-        });
-    };
-
-    private convertToString = (elem: DropdownElem) => {
-        if (elem !== undefined && elem !== null) {
-            return elem.toString();
-        }
-
-        return '';
-    };
-}
-
-export {
-    DropdownComponent,
+    return (
+        <div
+            className={classnames('cr-dropdown', className, {
+                'cr-dropdown--default': selected === placeholder,
+            })}>
+            <Dropdown>
+                <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                    {selected}
+                    <ChevronIcon className="cr-dropdown__arrow" />
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    {list.map((item, index) => (
+                        <Dropdown.Item key={index} onSelect={() => handleSelect(item, index)}>
+                            {item}
+                        </Dropdown.Item>
+                    ))}
+                </Dropdown.Menu>
+            </Dropdown>
+        </div>
+    );
 };

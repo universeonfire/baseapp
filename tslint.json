@@ -21,10 +21,7 @@
     "cyclomatic-complexity": false,
     "no-mixed-operators": false,
     "no-unexpected-multiline": false,
-    "arrow-parens": [
-      true,
-      "ban-single-arg-parens"
-    ],
+    "arrow-parens": false,
     "interface-name": [
       true,
       "never-prefix"
@@ -109,7 +106,7 @@
       "allow-declarations"
     ],
     "no-parameter-reassignment": true,
-    "only-arrow-functions": true,
+    "only-arrow-functions": false,
     "prefer-for-of": true,
     "promise-function-async": true,
     "await-promise": true,
